@@ -35,8 +35,7 @@ python tumblr_backup.py www.example.com
 
 By default, a new folder with post data saved in individual HTML files will be created,
 and resources like images will be saved in appropriately named subfolders.
-The alternative is to save the post data in a single CSV file,
-behavior which you can specify via the command line option `csv` like so:
+You can also save the post data in a single CSV file by using the command line option `csv` like so:
 
 ```bash
 python tumblr_backup.py --csv=true example.tumblr.com

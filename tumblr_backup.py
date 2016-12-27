@@ -74,14 +74,14 @@ def savePost(post, save_folder, header="", use_csv=False, save_file=None):
         f = open(save_file, "ab")
         writer = csv.writer(f)
         row = [slug, date_gmt]
-    else:
-        slug = byte_truncate(slug)
-        file_name = os.path.join(save_folder, slug + ".html")
-        f = codecs.open(file_name, "w", encoding=ENCODING)
 
-        # header info which is the same for all posts
-        f.write(header)
-        f.write('<p class="timestamp">' + date_gmt + '</p>')
+    slug = byte_truncate(slug)
+    file_name = os.path.join(save_folder, slug + ".html")
+    f = codecs.open(file_name, "w", encoding=ENCODING)
+
+    # header info which is the same for all posts
+    f.write(header)
+    f.write('<p class="timestamp">' + date_gmt + '</p>')
 
     if post["type"] == "regular":
         title = ""
@@ -96,11 +96,11 @@ def savePost(post, save_folder, header="", use_csv=False, save_file=None):
         if use_csv:
             row.append(title)
             row.append(body)
-        else:
-            if title:
-                f.write("<h3>" + title + "</h3>")
-            if body:
-                f.write(body)
+        
+        if title:
+           f.write("<h3>" + title + "</h3>")
+        if body:
+           f.write(body)
     elif use_csv:
         # add in blank columns to maintain the correct number
         row.append('')
@@ -140,8 +140,8 @@ def savePost(post, save_folder, header="", use_csv=False, save_file=None):
         if use_csv:
             row.append(caption)
             row.append('images/' + image_filename)
-        else:
-            f.write(caption + '<img alt="' + caption.replace('"', '&quot;') + '" src="images/' + image_filename + '" />')
+       
+        f.write(caption + '<img alt="' + caption.replace('"', '&quot;') + '" src="images/' + image_filename + '" />')
     elif use_csv:
         # add in blank columns to maintain the correct number
         row.append('')
@@ -160,11 +160,11 @@ def savePost(post, save_folder, header="", use_csv=False, save_file=None):
         if use_csv:
             row.append(quote)
             row.append(source)
-        else:
-            if quote:
-                f.write("<blockquote>" + quote + "</blockquote>")
-            if source:
-                f.write('<p class="quotesource">' + source + '</p>')
+        
+        if quote:
+            f.write("<blockquote>" + quote + "</blockquote>")
+        if source:
+            f.write('<p class="quotesource">' + source + '</p>')
     elif use_csv:
         # add in blank columns to maintain the correct number
         row.append('')
@@ -188,18 +188,18 @@ def savePost(post, save_folder, header="", use_csv=False, save_file=None):
             row.append(link_text)
             row.append(link_url)
             row.append(link_desc)
-        else:
-            if link_url or link_text:
-                f.write('<h3>')
-                if link_url:
-                    f.write('<a href="' + link_url + '">')
-                if link_text:
-                    f.write(link_text)
-                if link_url:
-                    f.write('</a>')
-                f.write('</h3>')
-            if link_desc:
-                f.write('<p class="linkdescription">' + link_desc + '</p>')
+        
+        if link_url or link_text:
+            f.write('<h3>')
+            if link_url:
+                f.write('<a href="' + link_url + '">')
+            if link_text:
+                f.write(link_text)
+            if link_url:
+                f.write('</a>')
+            f.write('</h3>')
+        if link_desc:
+            f.write('<p class="linkdescription">' + link_desc + '</p>')
     elif use_csv:
         # add in blank columns to maintain the correct number
         row.append('')
@@ -212,12 +212,12 @@ def savePost(post, save_folder, header="", use_csv=False, save_file=None):
             tags_string = [unescape(tag.string) for tag in tags]
             tags_joined = "|".join(tags_string)
             row.append(tags_joined)
-        else:
-            f.write('<h4>Tagged</h4>')
-            f.write('<ul>')
-            for tag in tags:
-                f.write('<li>' + unescape(tag.string) + '</li>')
-            f.write('</ul>')
+        
+        f.write('<h4>Tagged</h4>')
+        f.write('<ul>')
+        for tag in tags:
+            f.write('<li>' + unescape(tag.string) + '</li>')
+        f.write('</ul>')
     elif use_csv:
         # add in blank columns to maintain the correct number
         row.append('')
@@ -225,9 +225,9 @@ def savePost(post, save_folder, header="", use_csv=False, save_file=None):
     if use_csv:
         encoded_row = [cell.encode(ENCODING) for cell in row]
         writer.writerow(encoded_row)
-    else:
-        # common footer
-        f.write("</body></html>")
+    
+    # common footer
+    f.write("</body></html>")
     f.close()
 
 
@@ -256,16 +256,16 @@ def backup(account, use_csv=False, save_folder=None, start_post = 0):
         f = open(save_file, "w") # erases any existing data
         f.write("Slug,Date (GMT),Regular Title,Regular Body,Photo Caption,Photo URL,Quote Text,Quote Source,Link Text,Link URL,Link Description,Tags\r\n") # 12 columns
         f.close()
-    else:
-        # collect all the meta information
-        tumblelog = soup.find("tumblelog")
-        title = tumblelog["title"]
-        description = tumblelog.string
+    
+    # collect all the meta information
+    tumblelog = soup.find("tumblelog")
+    title = tumblelog["title"]
+    description = tumblelog.string
 
-        # use it to create a generic header for all posts
-        header = '<html><meta http-equiv="content-type" content="text/html; charset=' + ENCODING + '"/>'
-        header += "<head><title>" + title + "</title></head><body>"
-        header += "<h1>" + title + "</h1><h2>" + unescape(description) + "</h2>"
+    # use it to create a generic header for all posts
+    header = '<html><meta http-equiv="content-type" content="text/html; charset=' + ENCODING + '"/>'
+    header += "<head><title>" + title + "</title></head><body>"
+    header += "<h1>" + title + "</h1><h2>" + unescape(description) + "</h2>"
 
     # then find the total number of posts
     posts_tag = soup.find("posts")
@@ -288,8 +288,7 @@ def backup(account, use_csv=False, save_folder=None, start_post = 0):
         for post in posts:
             if use_csv:
                 savePost(post, save_folder, use_csv=use_csv, save_file=save_file)
-            else:
-                savePost(post, save_folder, header=header)
+            savePost(post, save_folder, header=header)
 
     print "Backup Complete"
 
